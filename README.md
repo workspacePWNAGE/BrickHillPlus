@@ -10,6 +10,6 @@ _Figure customization has body colors, but not faces & hats. These will be added
 ## Compiling & Running
 __Requirements__  
 - [NodeJS](https://nodejs.org/)  
-- [wxWdigets](https://wxwidgets.org/)
+- [wxWidgets](https://wxwidgets.org/)
 - [umu-launcher](https://github.com/Open-Wine-Components/umu-launcher)
 - Linux (Windows support coming soon)
