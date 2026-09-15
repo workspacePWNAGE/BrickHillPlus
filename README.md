@@ -2,7 +2,7 @@
 _A launcher for the infamous ROBLOX clone, Brick Hill!_
 
 ## Features
-- [-] Figure Customization  
+- [x] Figure Customization  
 _Figure customization has body colors, but not faces & hats. These will be added soon!_
 - [x] Usernames  
 - [ ] Modularize the program so its not one script
