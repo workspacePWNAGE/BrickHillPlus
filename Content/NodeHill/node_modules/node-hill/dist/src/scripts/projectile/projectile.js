@@ -1,0 +1,26 @@
+const PacketBuilder = require("../../net/PacketBuilder").default;
+const { hexToDec } = require("../../util/color/colorModule").default;
+function create(projectile) {
+    const packet = new PacketBuilder("Projectile")
+        .write("bool", true)
+        .write("uint32", projectile.projectileId)
+        .write("uint32", projectile.diameter)
+        .write("uint32", hexToDec(projectile.color))
+        .write("float", projectile.position.x)
+        .write("float", projectile.position.y)
+        .write("float", projectile.position.z)
+        .write("uint32", projectile.direction)
+        .write("uint32", projectile.zdirection)
+        .write("uint32", projectile.velocity);
+    return packet;
+}
+function destroy(projectile) {
+    const packet = new PacketBuilder("Projectile")
+        .write("bool", false)
+        .write("uint32", projectile.projectileId);
+    return packet;
+}
+module.exports = {
+    create,
+    destroy
+};

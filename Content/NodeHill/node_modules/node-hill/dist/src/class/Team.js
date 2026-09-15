@@ -1,0 +1,25 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const Game_1 = __importDefault(require("./Game"));
+/** This is used for creating team objects in Brick Hill. \
+ * ![](https://cdn.discordapp.com/attachments/601268924251897856/655573900318474253/unknown.png)
+*/
+class Team {
+    constructor(name, color = "#ffffff") {
+        Team.teamId += 1;
+        this.name = name;
+        this.color = color;
+        this.netId = Team.teamId;
+    }
+    /*
+    Returns an array of all the player's currently on this team.
+    */
+    get players() {
+        return Game_1.default.players.filter(p => p.team === this);
+    }
+}
+exports.default = Team;
+Team.teamId = 0;

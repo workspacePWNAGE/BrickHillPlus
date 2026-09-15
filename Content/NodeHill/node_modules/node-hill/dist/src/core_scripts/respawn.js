@@ -1,0 +1,32 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+/*eslint no-undef: "off"*/
+const CoreScript = require("./coreMethods").default;
+const cs = new CoreScript("respawn");
+cs.properties = {
+    fallHeight: -150,
+    respawnTime: 5
+};
+cs.newListener(Game, "playerJoin", (p) => {
+    cs.newListener(p, "died", () => __awaiter(this, void 0, void 0, function* () {
+        for (let i = 0; i < cs.properties.respawnTime; i++) {
+            p.topPrint(`You will respawn in ${cs.properties.respawnTime - i} seconds.`);
+            yield sleep(1000);
+        }
+        return p.respawn();
+    }));
+    const fallLoop = p.setInterval(() => {
+        if (cs.destroyed)
+            return clearInterval(fallLoop);
+        if (p.alive && p.position.z <= cs.properties.fallHeight) {
+            return p.kill();
+        }
+    }, 1000);
+});

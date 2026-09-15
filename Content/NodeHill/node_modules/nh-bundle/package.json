@@ -1,0 +1,12 @@
+{
+  "name": "nh-bundle",
+  "version": "1.4.6",
+  "description": "A package used for bundling node-hill maps / scripts.",
+  "main": "./bin/cli.js",
+  "bin": "./bin/cli.js",
+  "author": "Dragonian",
+  "license": "ISC",
+  "dependencies": {
+    "glob": "^7.1.7"
+  }
+}

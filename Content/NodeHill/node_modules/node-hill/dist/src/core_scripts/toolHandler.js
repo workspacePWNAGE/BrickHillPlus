@@ -1,0 +1,17 @@
+/*eslint no-undef: "off"*/
+const CoreScript = require("./coreMethods").default;
+const cs = new CoreScript("toolHandler");
+const e = (f) => cs.events.push(f);
+cs.newListener(Game, "playerJoin", (p) => {
+    e(p.keypress((key) => {
+        if (!p.inventory.length)
+            return;
+        key = parseInt(key);
+        if (isNaN(key))
+            return;
+        const tool = p.inventory[key - 1];
+        if (!tool || !tool.enabled)
+            return;
+        p.equipTool(tool);
+    }));
+});

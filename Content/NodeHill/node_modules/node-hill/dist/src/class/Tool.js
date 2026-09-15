@@ -1,0 +1,128 @@
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ToolEvents = void 0;
+const events_1 = require("events");
+const Game_1 = __importDefault(require("./Game"));
+const tool_1 = __importDefault(require("../scripts/tool/tool"));
+var ToolEvents;
+(function (ToolEvents) {
+    ToolEvents["Activated"] = "activated";
+    ToolEvents["Equipped"] = "equipped";
+    ToolEvents["Unequipped"] = "unequipped";
+})(ToolEvents = exports.ToolEvents || (exports.ToolEvents = {}));
+/** This is used for creating tools that can be used by in-game players.
+ *  ![](https://cdn.discordapp.com/attachments/601268924251897856/655572131299590154/unknown.png)
+ * */
+class Tool extends events_1.EventEmitter {
+    constructor(name) {
+        super();
+        /** If set to false, players will not be able to equip or de-equip the tool. */
+        this.enabled = true;
+        /** The assetId of the tool's model. */
+        this.model = 0;
+        Tool.toolId += 1;
+        this.name = name;
+        this.model = 0;
+        this.enabled = true;
+        this._slotId = Tool.toolId;
+    }
+    /** Calls the specified callback with the player who un-equipped the tool.
+    * @example
+    * ```js
+    * let tool = new Tool("Balloon")
+    * tool.model = 84038
+    * tool.unequipped((p) => {
+    *   p.setJumpPower(5) // Reset their jump power back to normal.
+    * })
+    * ```
+    */
+    unequipped(callback) {
+        const toolEvent = (p) => {
+            callback(p);
+        };
+        this.on("unequipped", toolEvent);
+        return {
+            disconnect: () => this.off("unequipped", toolEvent)
+        };
+    }
+    /**
+    * Calls the specified callback with the player who equipped the tool.
+    * @example
+    * ```js
+    * let tool = new Tool("Balloon")
+    * tool.model = 84038
+    * tool.equipped((p) => {
+    *   p.setJumpPower(20) // Give the player a height boost
+    * })
+    * ```
+    */
+    equipped(callback) {
+        const toolEvent = (p) => {
+            callback(p);
+        };
+        this.on("equipped", toolEvent);
+        return {
+            disconnect: () => this.off("equipped", toolEvent)
+        };
+    }
+    /** Completely destroys the tool, unequips it from all players, deletes it from their inventroy, and removes it from Game.world.tools. */
+    destroy() {
+        return __awaiter(this, void 0, void 0, function* () {
+            for (const player of Game_1.default.players) {
+                // Fire tool unequipped to player
+                if (player.toolEquipped === this) {
+                    player.toolEquipped = null;
+                    this.emit("unequipped", player);
+                }
+                // Remove the tool from the player's inventory
+                yield player.destroyTool(this);
+            }
+            const index = Game_1.default.world.tools.indexOf(this);
+            if (index === -1)
+                return;
+            Game_1.default.world.tools.splice(index, 1);
+            this.removeAllListeners();
+            return tool_1.default.destroy(this)
+                .broadcast();
+        });
+    }
+}
+exports.default = Tool;
+Tool.toolId = 0;
+/**
+* Fires when a player holding the tool clicks the left mouse button. \
+* This will not be emitted if you disable the toolHandler.js core script.
+* @event
+* @example
+* ```js
+* let tool = new Tool("Balloon")
+* tool.model = 84038
+* Game.on("playerJoin", (player) => {
+*    player.on("initialSpawn", () => {
+*        player.equipTool(tool)
+*    })
+* })
+* tool.on("activated", (p) => {
+*   console.log(p.username + " has clicked with the tool equipped!")
+* })
+* ```
+*/
+Tool.activated = ToolEvents.Activated;
+/** Fires when a player equips a tool.
+ * @event */
+Tool.equipped = ToolEvents.Equipped;
+/** Fires when a player unequips a tool.
+ * @event */
+Tool.unequipped = ToolEvents.Unequipped;

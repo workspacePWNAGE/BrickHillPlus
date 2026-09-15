@@ -1,0 +1,27 @@
+Context is not a terminal. Using pm2? Disable cli in server settings.
+<< PostServer: true | Port: 42480 | Map: Castle.brk >>
+[*] Loaded Core Script: bubbleChat.js
+[*] Disabled Core Script: cli.js
+[*] Loaded Core Script: coreMethods.js
+[*] Loaded Core Script: respawn.js
+[*] Loaded Core Script: teamSpawn.js
+[*] Loaded Core Script: toolHandler.js
+[*] Loaded User Script: customize.js
+[*] Loaded User Script: PwnsUtils.js
+Listening on port: 42480.
+Running server locally.
+<New client: 127.0.x.x>
+<Client: 127.0.x.x> Attempting authentication.
+Successfully verified! (Username: ({authUser.username} | ID:){authUser.userId} | Admin: false)
+pwn has joined | netId: 1
+Failure loading avatar appearance for pwn: 
+ SyntaxError: Unexpected token 'e', "error code: 1016
+" is not valid JSON
+    at JSON.parse (<anonymous>)
+    at CentraResponse.json (/home/pwn/Documents/Programming/BrickHillPlus/Content/NodeHill/node_modules/centra/model/CentraResponse.js:17:48)
+    at phin (/home/pwn/Documents/Programming/BrickHillPlus/Content/NodeHill/node_modules/phin/lib/phin.js:80:34)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async /home/pwn/Documents/Programming/BrickHillPlus/Content/NodeHill/node_modules/phin/lib/phin.js:118:9
+pwn: haio
+<Client: 127.0.x.x> Lost connection.
+pwn has left the game.

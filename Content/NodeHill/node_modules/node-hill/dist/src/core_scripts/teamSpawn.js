@@ -1,0 +1,25 @@
+/*eslint no-undef: "off"*/
+const CoreScript = require("./coreMethods").default;
+const cs = new CoreScript("teamSpawn");
+const e = (f) => cs.events.push(f);
+cs.methods.chooseTeamSpawn = (p) => {
+    // This is going to run everytime the player respawns, we need to be sure they have a team.
+    if (p.team) {
+        const spawns = Game.world.spawns.filter(brick => brick.color === p.team.color);
+        if (!spawns.length)
+            return;
+        const spawn = spawns[Math.floor(Math.random() * spawns.length)];
+        return spawn.center;
+    }
+};
+world.spawns.forEach((spawn) => {
+    e(spawn.touching((p) => {
+        const team = world.teams.find(t => t.color === spawn.color);
+        if (team && p.team !== team) {
+            return p.setTeam(team);
+        }
+    }));
+});
+cs.newListener(Game, "playerJoin", (p) => {
+    p.spawnHandler = cs.methods.chooseTeamSpawn;
+});

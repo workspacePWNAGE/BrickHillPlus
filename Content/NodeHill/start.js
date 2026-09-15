@@ -1,0 +1,1 @@
+const nh = require('node-hill'); nh.startServer({ hostKey: '', gameId: 478, port: \(PORT, ip: "\)IP", local: true, mapDirectory: './maps/', map: '\((basename )file)', scripts: './user_scripts', modules: [] })

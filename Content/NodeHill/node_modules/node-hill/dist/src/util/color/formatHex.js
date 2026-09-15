@@ -1,0 +1,27 @@
+"use strict";
+/*
+
+Converts [#hex]My message (so the client can interpret it for topPrints, chats, etc)
+
+Returns the *modified* input, or just input.
+
+*/
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const colorModule_1 = __importDefault(require("./colorModule"));
+const COLOR_REGEX = /(\[#[0-9a-fA-F]{6}\])/g;
+/**@hidden */
+function formatHex(input) {
+    const match = input.match(COLOR_REGEX);
+    if (!match)
+        return input;
+    match.forEach((colorCode) => {
+        let hexCol = colorCode.replace(/[[#\]]/g, "").toUpperCase();
+        hexCol = colorModule_1.default.rgbToBgr(hexCol);
+        input = input.replace(colorCode, `<color:${hexCol}>`);
+    });
+    return input;
+}
+exports.default = formatHex;

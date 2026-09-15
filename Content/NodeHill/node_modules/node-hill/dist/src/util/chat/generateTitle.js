@@ -1,0 +1,18 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const formatHex_1 = __importDefault(require("../color/formatHex"));
+function generateTitle(p, message) {
+    let title = `[#ffde0a]${p.username}\\c1:\\c0 ` + message;
+    if (p.team)
+        title = `[${p.team.color}]${p.username}\\c1:\\c0 ` + message;
+    if (p.admin)
+        title = `[#ffde0a]${p.username}\\c1:\\c0 ` + '[#ffde0a]' + message;
+    if (p.chatColor)
+        title = `[${p.chatColor}]${p.username}\\c1:\\c0 ` + message;
+    title = (0, formatHex_1.default)(title);
+    return title;
+}
+exports.default = generateTitle;

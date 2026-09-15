@@ -1,0 +1,181 @@
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PacketEnums = void 0;
+const zlib_1 = require("zlib");
+const smart_buffer_1 = require("smart-buffer");
+const uintv = __importStar(require("./uintv"));
+const Game_1 = __importDefault(require("../class/Game"));
+const AssetDownloader_1 = __importDefault(require("../class/AssetDownloader"));
+var PacketEnums;
+(function (PacketEnums) {
+    PacketEnums[PacketEnums["Authentication"] = 1] = "Authentication";
+    PacketEnums[PacketEnums["SendBrick"] = 17] = "SendBrick";
+    PacketEnums[PacketEnums["SendPlayers"] = 3] = "SendPlayers";
+    PacketEnums[PacketEnums["Figure"] = 4] = "Figure";
+    PacketEnums[PacketEnums["RemovePlayer"] = 5] = "RemovePlayer";
+    PacketEnums[PacketEnums["Chat"] = 6] = "Chat";
+    PacketEnums[PacketEnums["PlayerModification"] = 7] = "PlayerModification";
+    PacketEnums[PacketEnums["Kill"] = 8] = "Kill";
+    PacketEnums[PacketEnums["Brick"] = 9] = "Brick";
+    PacketEnums[PacketEnums["Team"] = 10] = "Team";
+    PacketEnums[PacketEnums["Tool"] = 11] = "Tool";
+    PacketEnums[PacketEnums["Bot"] = 12] = "Bot";
+    PacketEnums[PacketEnums["ClearMap"] = 14] = "ClearMap";
+    PacketEnums[PacketEnums["DestroyBot"] = 15] = "DestroyBot";
+    PacketEnums[PacketEnums["DeleteBrick"] = 16] = "DeleteBrick";
+})(PacketEnums = exports.PacketEnums || (exports.PacketEnums = {}));
+class PacketBuilder {
+    constructor(packetType, options) {
+        if (typeof packetType === "string")
+            this.packetId = PacketEnums[packetType];
+        else
+            this.packetId = packetType;
+        this.buffer = new smart_buffer_1.SmartBuffer();
+        this.idString = "";
+        this.options = options || {
+            compression: false
+        };
+    }
+    write(type, data) {
+        switch (type) {
+            case "string": {
+                this.buffer.writeStringNT(data);
+                break;
+            }
+            case "bool": {
+                data = data ? 1 : 0;
+                this.buffer.writeUInt8(data);
+                break;
+            }
+            case "float": {
+                this.buffer.writeFloatLE(data);
+                break;
+            }
+            case "uint8": {
+                this.buffer.writeUInt8(data);
+                break;
+            }
+            case "int32": {
+                this.buffer.writeInt32LE(data);
+                break;
+            }
+            case "uint32": {
+                this.buffer.writeUInt32LE(data);
+                break;
+            }
+        }
+        return this;
+    }
+    writeHeader() {
+        this.buffer.insertUInt8(this.packetId, 0);
+        if (this.idString)
+            this.buffer.insertStringNT(this.idString, 1);
+    }
+    writeAsset(assetId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!assetId)
+                return this.write("string", "none");
+            const data = yield AssetDownloader_1.default.getAssetData(assetId).catch(() => { });
+            if (!data)
+                return this;
+            if (data.mesh)
+                this.write("string", data.mesh);
+            if (data.texture)
+                this.write("string", data.texture);
+            return this;
+        });
+    }
+    // Convert SmartBuffer to a buffer, compress it, and add uintv size to header.
+    transformPacket() {
+        this.writeHeader();
+        let packet = this.buffer.toBuffer();
+        if (this.options.compression)
+            packet = (0, zlib_1.deflateSync)(packet);
+        return uintv.writeUIntV(packet);
+    }
+    /**
+     * Send a packet to every connected client except for players specified.
+    */
+    broadcastExcept(players) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const packet = this.transformPacket();
+            const promises = [];
+            for (const player of Game_1.default.players) {
+                if (!players.includes(player) && !player.socket.destroyed) {
+                    promises.push(new Promise((resolve) => {
+                        player.socket.write(packet, null, resolve);
+                    }));
+                }
+            }
+            yield Promise.all(promises);
+            return true;
+        });
+    }
+    /**
+     * Send a packet to every connected client.
+     */
+    broadcast() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const packet = this.transformPacket();
+            const promises = [];
+            for (const player of Game_1.default.players) {
+                if (!player.socket.destroyed) {
+                    promises.push(new Promise((resolve) => {
+                        player.socket.write(packet, null, resolve);
+                    }));
+                }
+            }
+            yield Promise.all(promises);
+            return true;
+        });
+    }
+    /**
+     * Send a packet to a single client.
+    */
+    send(socket) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const packet = this.transformPacket();
+            if (socket.destroyed)
+                return;
+            return socket.write(packet, null, () => {
+                return Promise.resolve(true);
+            });
+        });
+    }
+}
+exports.default = PacketBuilder;

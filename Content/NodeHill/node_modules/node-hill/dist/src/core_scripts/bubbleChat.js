@@ -1,0 +1,21 @@
+/*eslint no-undef: "off"*/
+const CoreScript = require("./coreMethods").default;
+const cs = new CoreScript("bubbleChat");
+cs.properties = {
+    bubbleTime: 6000
+};
+cs.newListener(Game, "playerJoin", (p) => {
+    cs.newListener(p, "chatted", (msg) => {
+        if (p.alive) {
+            clearTimeout(p.bubbleTimer);
+            p.setSpeech(msg);
+            p.bubbleTimer = setTimeout(() => {
+                p.setSpeech("");
+            }, cs.properties.bubbleTime);
+        }
+    });
+    cs.newListener(p, "died", () => {
+        clearTimeout(p.bubbleTimer);
+        p.setSpeech("");
+    });
+});

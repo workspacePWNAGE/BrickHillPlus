@@ -1,0 +1,11 @@
+const PacketBuilder = require("../../net/PacketBuilder").default;
+const formatHex = require("../../util/color/formatHex").default;
+function topPrint(socket, message = "", seconds = 1) {
+    message = formatHex(message);
+    return new PacketBuilder("PlayerModification")
+        .write("string", "topPrint")
+        .write("string", message)
+        .write("uint32", seconds)
+        .send(socket);
+}
+module.exports = topPrint;

@@ -2,11 +2,14 @@
 _A launcher for the infamous ROBLOX clone, Brick Hill!_
 
 ## Features
-- [ ] Figure Rendering  
-- [ ] Figure Customization  
+- [-] Figure Customization  
+_Figure customization has body colors, but not faces & hats. These will be added soon!_
 - [x] Usernames  
+- [ ] Modularize the program so its not one script
 
-## Compiling & Running Node-Hill
+## Compiling & Running
 __Requirements__  
 - [NodeJS](https://nodejs.org/)  
-- [Golang](https://go.dev/)  
+- [wxWdigets](https://wxwidgets.org/)
+- [umu-launcher](https://github.com/Open-Wine-Components/umu-launcher)
+- Linux (Windows support coming soon)

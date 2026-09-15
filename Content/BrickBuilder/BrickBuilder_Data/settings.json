@@ -1,0 +1,102 @@
+{
+    "StudSnap": 0.5,
+    "RotationSnap": 15,
+    "CopySuffix": false,
+    "CopyToWorkshopFormat": false,
+    "CameraSpeed": 24,
+    "CameraSensitivity": 4.0,
+    "FOV": 70,
+    "ViewDistance": 1000,
+    "Framelimiter": true,
+    "Framelimit": 144,
+    "Autosave": true,
+    "AutosaveRate": 2,
+    "UIBlur": false,
+    "ScreenshotSizeMultiplier": 1,
+    "DiscordRP": true,
+    "SavedColors": [
+        {
+            "r": 0.0,
+            "g": 0.0,
+            "b": 0.0,
+            "a": 1.0
+        },
+        {
+            "r": 0.0,
+            "g": 0.0,
+            "b": 0.0,
+            "a": 1.0
+        },
+        {
+            "r": 0.0,
+            "g": 0.0,
+            "b": 0.0,
+            "a": 1.0
+        },
+        {
+            "r": 0.0,
+            "g": 0.0,
+            "b": 0.0,
+            "a": 1.0
+        },
+        {
+            "r": 0.0,
+            "g": 0.0,
+            "b": 0.0,
+            "a": 1.0
+        },
+        {
+            "r": 0.0,
+            "g": 0.0,
+            "b": 0.0,
+            "a": 1.0
+        },
+        {
+            "r": 0.0,
+            "g": 0.0,
+            "b": 0.0,
+            "a": 1.0
+        },
+        {
+            "r": 0.0,
+            "g": 0.0,
+            "b": 0.0,
+            "a": 1.0
+        }
+    ],
+    "EnabledHotkeys": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+    ],
+    "HotkeyPaths": [
+        "<Keyboard>/n",
+        "<Keyboard>/c",
+        "<Keyboard>/v",
+        "<Keyboard>/x",
+        "<Keyboard>/d",
+        "<Keyboard>/s",
+        "<Keyboard>/o",
+        "<Keyboard>/1",
+        "<Keyboard>/2",
+        "<Keyboard>/3",
+        "<Keyboard>/a",
+        "<Keyboard>/z",
+        "<Keyboard>/y",
+        "<Keyboard>/g"
+    ],
+    "AmbientLight": 0.0,
+    "BrickHillPlayerPath": "",
+    "NodeHillServerPath": ""
+}
