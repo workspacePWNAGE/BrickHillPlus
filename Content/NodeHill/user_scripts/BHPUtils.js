@@ -3,7 +3,7 @@ const prefix = "!"
 const killbrickName = "Killbrick"
 
 // get all killbricks
-var killBricks = world.bricks.filter(brick => brick.name === killbrickName);
+const killBricks = Game.world.bricks.filter(brick => brick.name === killbrickName);
 
 // chat utils
 Game.on("playerJoin", (player) => {
