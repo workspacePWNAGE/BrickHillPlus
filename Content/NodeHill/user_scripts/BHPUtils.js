@@ -1,6 +1,13 @@
+// requires
+const http = getModule('http');
+const fs = getModule('fs');
+const path = getModule('path');
+
 // config
 const prefix = "!"
 const killbrickName = "Killbrick"
+const assetDir = './assets';
+const assetsPort = 42481;
 
 // get all killbricks
 const killBricks = Game.world.bricks.filter(brick => brick.name === killbrickName);
@@ -55,3 +62,20 @@ killBricks.forEach(brick => {
         player.kill();
     });
 });
+
+// set up asset server
+// http.createServer((req, res) => {
+//     const id = decodeURIComponent(req.url.slice(1));
+//     if (!/^[a-zA-Z0-9_-]{1,64}$/.test(id)) {
+//         res.writeHead(400);
+//         return res.end();
+//     }
+//     fs.readFile(path.join(assetDir, id + '.png'), (err, data) => {
+//         if (err) {
+//             res.writeHead(404);
+//             return res.end();
+//         }
+//         res.writeHead(200, { 'Content-Type': 'image/png' });
+//         res.end(data);
+//     });
+// }).listen(FACE_PORT, () => console.log(`asset server running on port ${assetsPort}`));

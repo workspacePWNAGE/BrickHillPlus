@@ -1,13 +1,15 @@
-#include <wx/wx.h>
-#include <wx/colordlg.h>
-#include <wx/dcbuffer.h>
-#include <wx/dcgraph.h>
-#include <fstream>
-#include <sstream>
-#include <filesystem>
-#include <vector>
-#include <string>
-#include <algorithm>
+#include "wx/wx.h"
+#include "wx/colordlg.h"
+#include "wx/dcbuffer.h"
+#include "wx/dcgraph.h"
+#include "vector"
+#include "utility"
+#include "string"
+#include "filesystem"
+#include "fstream"
+#include "sstream"
+#include "algorithm"
+#include "cstdlib"
 
 namespace fs = std::filesystem;
 
@@ -410,7 +412,6 @@ std::string MyFrame::SelectMap()
     return "";
 }
 
-
 void MyFrame::WriteStartJs(const std::string &ip, const std::string &port, const std::string &map)
 {
     std::ofstream out("./Content/NodeHill/startold.js");
@@ -505,6 +506,9 @@ std::string MyFrame::LoadUsername()
 
 void MyFrame::OpenLogTerminal()
 {
+#ifdef _WIN32
+    wxExecute("powershell -Command \"Get-Content -Path ./Content/NodeHill/server.log -Wait\"", wxEXEC_ASYNC);
+#else
     wxArrayString terminals;
     terminals.Add("kitty --title \"Brick Hill+ Server Logs\" tail -f ./Content/NodeHill/server.log");
     terminals.Add("alacritty --title \"Brick Hill+ Server Logs\" -e tail -f ./Content/NodeHill/server.log");
@@ -526,6 +530,7 @@ void MyFrame::OpenLogTerminal()
     }
 
     wxExecute("/bin/sh -c \"xterm -title \\\"Brick Hill+ Server Logs\\\" -e tail -f ./Content/NodeHill/server.log\"", wxEXEC_ASYNC);
+#endif
 }
 
 void MyFrame::OnHostServer(wxCommandEvent &event)
@@ -536,7 +541,13 @@ void MyFrame::OnHostServer(wxCommandEvent &event)
         {
             wxKill(m_serverPid, wxSIGTERM);
         }
+        
+#ifdef _WIN32
+        wxExecute("taskkill /F /IM node.exe /T", wxEXEC_ASYNC | wxEXEC_NODISABLE);
+#else
         wxExecute("pkill -f startold.js", wxEXEC_ASYNC | wxEXEC_NODISABLE);
+#endif
+        
         m_serverRunning = false;
         m_serverPid = 0;
         m_btnHost->SetLabel("Host Server");
@@ -556,13 +567,21 @@ void MyFrame::OnHostServer(wxCommandEvent &event)
         fs::create_directories("./Content/NodeHill");
         if (!fs::exists("./Content/NodeHill/package.json"))
         {
+#ifdef _WIN32
+            wxExecute("cmd.exe /c \"cd ./Content/NodeHill && npm init -y\"", wxEXEC_SYNC);
+#else
             wxExecute("/bin/sh -c \"cd ./Content/NodeHill && npm init -y\"", wxEXEC_SYNC);
+#endif
         }
         if (!fs::exists("./Content/NodeHill/node_modules/node-hill"))
         {
             SetStatusText("Installing node-hill package...");
             wxSafeYield();
+#ifdef _WIN32
+            wxExecute("cmd.exe /c \"cd ./Content/NodeHill && npm install node-hill\"", wxEXEC_SYNC);
+#else
             wxExecute("/bin/sh -c \"cd ./Content/NodeHill && npm install node-hill\"", wxEXEC_SYNC);
+#endif
         }
 
         WriteStartJs(ip, port, chosenMap);
@@ -570,7 +589,12 @@ void MyFrame::OnHostServer(wxCommandEvent &event)
         std::ofstream clearLog("./Content/NodeHill/server.log", std::ios::trunc);
         clearLog.close();
 
+#ifdef _WIN32
+        std::string cmd = "cmd.exe /c \"cd ./Content/NodeHill && node startold.js > server.log 2>&1\"";
+#else
         std::string cmd = "/bin/sh -c \"cd ./Content/NodeHill && node startold.js > server.log 2>&1\"";
+#endif
+
         m_serverPid = wxExecute(wxString(cmd), wxEXEC_ASYNC);
 
         if (m_serverPid > 0)
@@ -599,30 +623,38 @@ void MyFrame::OnJoinServer(wxCommandEvent &event)
     }
     SaveUsername(username);
 
+#ifdef _WIN32
+    std::string cmd = "cmd.exe /c \"Content\\Client\\Client.exe " + ip + "/" + ip + "/" + port + "\"";
+#else
     std::string cmd = "/bin/sh -c \"GAMEID=0 umu-run Content/Client/Client.exe \\\"" + ip + "/" + ip + "/" + port + "\\\"\"";
+#endif
+
     wxExecute(wxString(cmd), wxEXEC_ASYNC);
     SetStatusText("Joining server as " + username + "...");
 }
 
 void MyFrame::OnWorkshop(wxCommandEvent &event)
 {
+#ifdef _WIN32
+    std::string workshopPath = "./Content/BrickBuilder/BrickBuilder.exe";
+    if (!fs::exists(workshopPath))
+    {
+        SetStatusText("Error: " + workshopPath + " not found!");
+        return;
+    }
+    std::string cmd = "cmd.exe /c \"" + workshopPath + "\"";
+#else
     std::string workshopPath = "./Content/BrickBuilder/BrickBuilder.x86_64";
     if (!fs::exists(workshopPath))
     {
         SetStatusText("Error: " + workshopPath + " not found!");
         return;
     }
-
     std::string cmd = "/bin/sh -c \"" + workshopPath + "\"";
+#endif
+
     wxExecute(wxString(cmd), wxEXEC_ASYNC);
     SetStatusText("Opening Workshop...");
-}
-
-void MyFrame::OnFigure(wxCommandEvent &event)
-{
-    FigureDialog dlg(this);
-    dlg.ShowModal();
-    SetStatusText("Updated figure colors.");
 }
 
 void MyFrame::OnWindowClose(wxCloseEvent &event)
@@ -632,6 +664,16 @@ void MyFrame::OnWindowClose(wxCloseEvent &event)
         wxKill(m_serverPid, wxSIGTERM);
     }
     
+#ifdef _WIN32
+    wxExecute("taskkill /F /IM node.exe /T", wxEXEC_SYNC);
+#else
     wxExecute("pkill -f startold.js", wxEXEC_SYNC);
+#endif
     event.Skip();
+}
+
+void MyFrame::OnFigure(wxCommandEvent &event)
+{
+    FigureDialog dialog(this);
+    dialog.ShowModal();
 }
