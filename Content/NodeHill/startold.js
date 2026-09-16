@@ -8,5 +8,5 @@ nh.startServer({
     mapDirectory: './maps/',
     map: 'Castle.brk',
     scripts: './user_scripts',
-    modules: ["fs"]
+    modules: ["fs", "path", "http"]
 });

@@ -1,8 +1,3 @@
-// requires
-const http = getModule('http');
-const fs = getModule('fs');
-const path = getModule('path');
-
 // config
 const prefix = "!"
 const killbrickName = "Killbrick"
